@@ -1,7 +1,7 @@
 
 # CellRad Dosimetry Explorer (CellRad-DE)
 
-**CellRad Dosimetry Explorer (CellRad-DE)** is an advanced, scalable toolkit designed to analyze radiation dosimetry at the cellular level comprehensively. This tool uses high-dimensional multiplexed images as inputs to acquire high-resolution, multiplexed data. These data inputs enable precise cell segmentation and automatic cell annotation, which is critical for detailed cellular analysis. The software predicts the energy deposition of various radionuclides within different cell types based on specific markers of interest. Utilizing advanced algorithms, this toolkit can accurately model the spatial distribution of radionuclide energy deposition at the subcellular level. This capability is essential for understanding the differential effects of targeted radionuclide therapies at the cellular level. In addition to its robust analytical capabilities, the software is designed to be efficient and user-friendly, providing an intuitive interface that facilitates complex data analysis without requiring extensive computational expertise. This makes it an invaluable tool for researchers in molecular radiology and radiation oncology, enabling them to conduct detailed dosimetry studies, optimize therapeutic strategies, and ultimately enhance the precision and efficacy of cancer treatments.
+**CellRad Dosimetry Explorer (CellRad-DE)** is an advanced, scalable toolkit designed to analyze radiation dosimetry at the cellular level comprehensively. This tool uses high-dimensional multiplexed images as inputs to acquire high-resolution, multiplexed data. These data inputs enable precise cell segmentation and automatic cell annotation, which is critical for detailed cellular analysis. The software predicts the energy deposition of various radionuclides within different cell types based on specific markers of interest. Utilizing advanced algorithms, this toolkit can accurately model the spatial distribution of radionuclide energy deposition at the subcellular level. This capability is essential for understanding the differential effects of targeted radionuclide therapies at the cellular level. In addition to its robust analytical capabilities, the software is designed to be efficient and user-friendly, providing an intuitive interface that facilitates complex data analysis without requiring extensive computational expertise. This makes it an invaluable tool for molecular radiology and radiation oncology researchers, enabling them to conduct detailed dosimetry studies, optimize therapeutic strategies, and ultimately enhance the precision and efficacy of cancer treatments.
 
 ## Key Features
 
@@ -13,11 +13,10 @@
 
 ## Application and Benefits
 
-CellRad-DE is a groundbreaking tool for advancing the understanding of cellular responses to radiation therapy. By integrating multiplex imaging data and performing detailed dosimetry analyses, this software enables researchers to:
-
-- Identify the best radiation therapy protocols for different cellular markers.
-- Predict the optimal radionuclides for specific therapeutic targets.
-- Assess potential DNA damage across various cell types, aiding in the development of more effective and personalized radiation treatments.
+CellRad-DE is a toolkit for advancing the understanding of cellular damage from radionuclide therapy. By integrating multiplex imaging data and performing detailed dosimetry analyses, this software enables researchers to:
+- Identify the best radionuclides for use in radionuclide therapy based on different cellular markers.
+- Predict the optimal radionuclide therapy doses to minimize the adverse effects.
+- Assess potential DNA damage across various cell types, aiding in developing more effective and personalized radionuclide therapies.
 
 ## Contributors
 Arvin Haj-Mirzaian; Victor Valladolid Onecha; Alejandro Bertolet Reina; Pedram Heidari
