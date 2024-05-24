@@ -1,7 +1,7 @@
 
 # Cell-Level Radiation Dosimetry Explorer (CellRad-DE)
 
-**Cell-Level Radiation Dosimetry Explorer (CellRad-DE)** is an advanced, scalable toolkit designed to analyze radiation dosimetry at the cellular level comprehensively. This tool uses high-dimensional multiplexed images as inputs to acquire high-resolution, multiplexed data. These data inputs enable precise cell segmentation and automatic cell annotation, which is critical for detailed cellular analysis. The software predicts the energy deposition of various radionuclides within different cell types based on specific markers of interest. Utilizing advanced algorithms, this toolkit can accurately model the spatial distribution of radionuclide energy deposition at the subcellular level. This capability is essential for understanding the differential effects of targeted radionuclide therapies at the cellular level. In addition to its robust analytical capabilities, the software is designed to be efficient and user-friendly, providing an intuitive interface that facilitates complex data analysis without requiring extensive computational expertise. This makes it an invaluable tool for molecular radiology and radiation oncology researchers, enabling them to conduct detailed dosimetry studies, optimize therapeutic strategies, and ultimately enhance the precision and efficacy of cancer treatments.
+**Cell-Level Radiation Dosimetry Explorer (CellRad-DE)** is an advanced, scalable toolkit designed to comprehensively analyze radiation dosimetry at the cellular level. This tool uses high-dimensional multiplexed images as inputs to acquire high-resolution, multiplexed data. These data inputs enable precise cell segmentation and automatic cell annotation, which is critical for detailed cellular analysis. The software predicts the energy deposition of various radionuclides within different cell types based on specific markers of interest. Utilizing advanced algorithms, this toolkit can accurately model the spatial distribution of radionuclide energy deposition at the subcellular level. This capability is essential for understanding the differential effects of targeted radionuclide therapies at the cellular level. In addition to its robust analytical capabilities, the software is designed to be efficient and user-friendly, providing an intuitive interface that facilitates complex data analysis without requiring extensive computational expertise. This makes it an invaluable tool for molecular radiology and radiation oncology researchers, enabling them to conduct detailed dosimetry studies, optimize therapeutic strategies, and ultimately enhance the precision and efficacy of cancer treatments.
 
 ## Key Features
 
@@ -57,11 +57,11 @@ Apple silicon users might encounter issues during installation due to package co
 ### Inputs and data preparation
 This toolkit is compatible with any type of high-dimensional multiplexed images of any size. However, for very large image sizes, we recommend considering the use of a server cluster to ensure optimal performance.
 In addition to the image files (typically in *.ome.tif format), two CSV files are required for this toolkit to predict cell type annotations. Please refer to the example files in the 'examples' folder. The **'markers'** CSV file should describe all markers used for multiplex imaging. Note that all DNA channels should be renamed to DAPI, regardless of the specific DNA stain used, as the software recognizes the nuclei channel as 'DAPI'. The **'marker_cell_types'** CSV file lists all the markers and their associated cell types based on the markers used. For instance, if your experiment visualizes Macrophages, B cells, and T cells using CD45 as an immune cell marker, you should list all these cell types next to the CD45 row. If a marker is specific to one cell type, only the targeted cell type should be mentioned; for example, CD20 should be listed with B cells only. This file should be meticulously prepared to ensure optimal and accurate cell type annotation.
-Overall, this toolkit requires three main files: the **'ome.tif'** file, **'markers.csv'**, and **'marker_cell_types.csv'**. We recommend placing all these files in the 'processing' directory and following the tutorial provided in the 'notebooks' directory. For step by step tutroial please follow the notebooks in 'notebooks' folder. Below are description of each function used in this toolkit.
+This toolkit requires three main files: the **'ome.tif'** file, **'markers.csv'**, and **'marker_cell_types.csv'**. We recommend placing all these files in the 'processing' directory and following the tutorial in the 'notebooks' directory. For a step-by-step tutorial, please follow the notebooks in the 'notebooks' folder. Below are descriptions of each function used in this toolkit.
 
 ### Functions
 #### resize
-If you are using a personal computer and considering resizing the image to save memory, use the function below. However, we do not recommend using this function if the pixel size is higher than 0.65 microns and the field of view is greater than 5 mm. Resizing the image may decrease the accuracy of cell segmentation.
+If users are using a personal computer and considering resizing the image to save memory, use the function below. However, we do not recommend using this function if the pixel size is higher than 0.65 microns and the field of view is greater than 5 mm. Resizing the image may decrease the accuracy of cell segmentation.
 
 ```bash
 resize(input_path, output_path, resize_ratio)
@@ -72,7 +72,7 @@ resize('path/to/image.ome.tif', 'path/to/output.ome.tif', 2)
 ```output_path```: Path to the resized output image
 ```resize_ratio```: The factor by which to divide the image dimensions
 #### segment_cells
-In this function, by leveraging a deep learning model ([Deepcell](https://github.com/vanvalenlab/intro-to-deepcell) <sup>1</sup>), users are able to segment cells based on the DNA channel (DAPI) and a membrane (recommended) or cytoplasm marker.
+In this function, by leveraging a deep learning model ([Deepcell](https://github.com/vanvalenlab/intro-to-deepcell) <sup>1</sup>), users can segment cells based on the DNA channel (DAPI) and a membrane (recommended) or cytoplasm marker.
 
 <sub><i> 1. Greenwald, N.F., Miller, G., Moen, E., Kong, A., Kagel, A., Dougherty, T., Fullaway, C.C., McIntosh, B.J., Leow, K.X., Schwartz, M.S., and Pavelchek, C., 2022. Whole-cell segmentation of tissue images with human-level performance using large-scale data annotation and deep learning. Nature Biotechnology, 40(4), pp.555-565.</i></sub>
 
@@ -83,11 +83,11 @@ segment_cells('path/to/origina_image.ome.tif', 'path/to/cell_segmentation.ome.ti
 ```
 
 ```input_path```: Path to the original image
-```output_path```: Path to the predicted cell segmenation mask
-```dapi_idx```: The channel numebr where DAPI is (chhanel number starts from 0)
-```membrane_idx```: : The channel numebr where memraben or cytoplasm is (chhanel number starts from 0)
-```pixel_size```: Pixel size; it has two parameter if user choose 'auto'  it automatically find pixel size from ome.tif file or user can enter it manually i.e. '0.325'
-```token```: This funcction required a token from deepcell. User can sign up https://datasets.deepcell.org/join and get their own token. 
+```output_path```: Path to the predicted cell segmentation mask
+```dapi_idx```: The channel number where DAPI is (channel number starts from 0)
+```membrane_idx```: The channel number where membrane or cytoplasm is (channel number starts from 0)
+```pixel_size```: Pixel size; has two parameters. If the user chooses 'auto,'  it automatically finds the pixel size from the ome.tif file, or the user can enter it manually, i.e., '0.325.'
+```token```: This function required a token from Deepcell. User can sign up https://datasets.deepcell.org/join and get their token. 
 
 #### extract_single_cell_data
 This function extracts all cell information, including the location and size of the cells, as well as marker expression in each cell. The outputs are saved in three formats: **'cell_data.csv'**, **'cell_data.h5ad'**, and **'cell_data_spatial.npy'**.
