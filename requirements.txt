@@ -1,0 +1,14 @@
+Pillow
+tifffile
+numpy
+matplotlib
+deepcell
+ome-types
+napari
+opencv-python-headless
+pandas
+scikit-image
+anndata
+scanpy
+scimap
+phenotype-cells
