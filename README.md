@@ -54,7 +54,7 @@ conda activate CellRad-DE
 ### Inputs and data preparation
 This toolkit is compatible with any type of high-dimensional multiplexed images of any size. However, for very large image sizes, we recommend considering the use of a server cluster to ensure optimal performance.
 In addition to the image files (typically in *.ome.tif format), two CSV files are required for this toolkit to predict cell type annotations. Please refer to the example files in the 'examples' folder. The **'markers'** CSV file should describe all markers used for multiplex imaging. Note that all DNA channels should be renamed to DAPI, regardless of the specific DNA stain used, as the software recognizes the nuclei channel as 'DAPI'. The **'marker_cell_types'** CSV file lists all the markers and their associated cell types based on the markers used. For instance, if your experiment visualizes Macrophages, B cells, and T cells using CD45 as an immune cell marker, you should list all these cell types next to the CD45 row. If a marker is specific to one cell type, only the targeted cell type should be mentioned; for example, CD20 should be listed with B cells only. This file should be meticulously prepared to ensure optimal and accurate cell type annotation.
-Overall, this toolkit requires three main files: the **ome.tif** file, **markers.csv**, and **marker_cell_types.csv**. We recommend placing all these files in the 'processing' directory and following the tutorial provided in the 'notebooks' directory. For step by step tutroial please follow the notebooks in 'notebooks' folder. Below are description of each function used in this toolkit.
+Overall, this toolkit requires three main files: the **'ome.tif'** file, **'markers.csv'**, and **'marker_cell_types.csv'**. We recommend placing all these files in the 'processing' directory and following the tutorial provided in the 'notebooks' directory. For step by step tutroial please follow the notebooks in 'notebooks' folder. Below are description of each function used in this toolkit.
 
 ### Functions
 #### resize
@@ -87,7 +87,7 @@ segment_cells('path/to/origina_image.ome.tif', 'path/to/cell_segmentation.ome.ti
 ```token```: This funcction required a token from deepcell. User can sign up https://datasets.deepcell.org/join and get their own token. 
 
 #### extract_single_cell_data
-This function extarcts all cells information incdluding location and size of the cells as well as marker experesion in each cell and save the outputs as cell_data.csv, and cell_data.h5ad, cell_data_spatial.npy.
+This function extracts all cell information, including the location and size of the cells, as well as marker expression in each cell. The outputs are saved in three formats: **'cell_data.csv'**, **'cell_data.h5ad'**, and **'cell_data_spatial.npy'**.
 
 ```bash
 extract_single_cell_data(masks, image, channel_names, output_dir)
@@ -99,6 +99,9 @@ extract_single_cell_data(masks='path/to/cell_segmentation.ome.tif', image='path/
 ```image```: Path to the original image
 ```channel_names```: Path to markers.csv (described previously)
 ```output_dir```: : Path to the output files
+
+#### celltype_prediction
+
 
 
 
