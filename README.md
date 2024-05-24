@@ -59,7 +59,7 @@ Overall, this toolkit requires three main files: the **ome.tif** file, **markers
 ### Functions
 #### resize
 If you are using a personal computer and considering resizing the image to save memory, use the function below. However, we do not recommend using this function if the pixel size is higher than 0.65 microns and the field of view is greater than 5 mm. Resizing the image may decrease the accuracy of cell segmentation.
-usage:
+
 ```bash
 resize(input_path, output_path, resize_ratio)
 # Example
@@ -71,17 +71,18 @@ resize('path/to/image.ome.tif', 'path/to/output.ome.tif', 2)
 #### segment_cells
 In this dunction by levearing a deep learning model (https://github.com/vanvalenlab/intro-to-deepcell) we were able to segment cell based on DNA channel (DAPI) and a memrbane (recommended) or cytoplams marker.
 Greenwald, N.F., Miller, G., Moen, E., Kong, A., Kagel, A., Dougherty, T., Fullaway, C.C., McIntosh, B.J., Leow, K.X., Schwartz, M.S. and Pavelchek, C., 2022. Whole-cell segmentation of tissue images with human-level performance using large-scale data annotation and deep learning. Nature biotechnology, 40(4), pp.555-565.
+```bash
+segment_cells(input_path, output_path, dapi_idx, membrane_idx, pixel_size, token)
+Example:
+segment_cells('path/to/origina_image.ome.tif', 'path/to/cell_segmentation.ome.tif', '24', '25', pixel_size='auto', token='e8MkSMdE.L6p85e7ToAR6UShqyzkSJP1m9H6WeZ2r')
+```
 
-Usage:
-```segment_cells(input_path, output_path, dapi_idx, membrane_idx, pixel_size, token)```
 ```input_path```: Path to the original image
 ```output_path```: Path to the predicted cell segmenation mask
 ```dapi_idx```: The channel numebr where DAPI is (chhanel number starts from 0)
 ```membrane_idx```: : The channel numebr where memraben or cytoplasm is (chhanel number starts from 0)
 ```pixel_size```: Pixel size; it has two parameter if user choose 'auto'  it automatically find pixel size from ome.tif file or user can enter it manually i.e. '0.325'
 ```token```: This funcction required a token from deepcell. User can sign up https://datasets.deepcell.org/join and get their own token. 
-Example:
-```segment_cells('path/to/origina_image.ome.tif', 'path/to/cell_segmentation.ome.tif', '24', '25', pixel_size='auto', token='e8MkSMdE.L6p85e7ToAR6UShqyzkSJP1m9H6WeZ2r')```
 
 ## License
 <p xmlns:cc="http://creativecommons.org/ns#" xmlns:dct="http://purl.org/dc/terms/"><a property="dct:title" rel="cc:attributionURL" href="https://github.com/arvinhm/CellRad-DE">Cell-Level Radiation Dosimetry Explorer (CellRad-DE)</a> by <a rel="cc:attributionURL dct:creator" property="cc:attributionName" href="https://github.com/arvinhm">Arvin Haj-Mirzaian, Victor Valladolid Onecha, Alejandro Bertolet Reina, and Pedram Heidari</a> is licensed under <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/?ref=chooser-v1" target="_blank" rel="license noopener noreferrer" style="display:inline-block;">CC BY-NC-ND 4.0<img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/cc.svg?ref=chooser-v1" alt=""><img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/by.svg?ref=chooser-v1" alt=""><img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/nc.svg?ref=chooser-v1" alt=""><img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/nd.svg?ref=chooser-v1" alt=""></a></p>
