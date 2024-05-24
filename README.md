@@ -54,17 +54,20 @@ conda activate CellRad-DE
 ### Inputs and data preparation
 This toolkit is compatible with any type of high-dimensional multiplexed images of any size. However, for very large image sizes, we recommend considering the use of a server cluster to ensure optimal performance.
 In addition to the image files (typically in *.ome.tif format), two CSV files are required for this toolkit to predict cell type annotations. Please refer to the example files in the 'examples' folder. The **'markers'** CSV file should describe all markers used for multiplex imaging. Note that all DNA channels should be renamed to DAPI, regardless of the specific DNA stain used, as the software recognizes the nuclei channel as 'DAPI'. The **'marker_cell_types'** CSV file lists all the markers and their associated cell types based on the markers used. For instance, if your experiment visualizes Macrophages, B cells, and T cells using CD45 as an immune cell marker, you should list all these cell types next to the CD45 row. If a marker is specific to one cell type, only the targeted cell type should be mentioned; for example, CD20 should be listed with B cells only. This file should be meticulously prepared to ensure optimal and accurate cell type annotation.
-Overall, this toolkit requires three main files: the **ome.tif** file, **markers.csv**, and **marker_cell_types.csv**. We recommend placing all these files in the 'processing' directory and following the tutorial provided in the 'notebooks' directory.
+Overall, this toolkit requires three main files: the **ome.tif** file, **markers.csv**, and **marker_cell_types.csv**. We recommend placing all these files in the 'processing' directory and following the tutorial provided in the 'notebooks' directory. For step by step tutroial please follow the notebooks in 'notebooks' folder. Below are description of each function used in this toolkit.
 
 ### Functions
-For step by step tutroial please follow the notebook in 'notebooks' folder. Below are description of each function used in this tool kit.
+#### resize
+If you are using a personal computer and considering resizing the image to save memory, use the function below. However, we do not recommend using this function if the pixel value is higher than 0.65 microns and the field of view is greater than 5 mm. Resizing the image may decrease the accuracy of cell segmentation.
 
-- resize
 usage:
 ```bash
 resize(input_path, output_path, resize_ratio)
 # Example
-resize('TNPCRC_14/TNPCRC_14.ome.tif', 'TNPCRC_14/TNPCRC_14_half.ome.tif', 2)
-
+resize('path/to/image.ome.tif', 'path/to/output.ome.tif', 2)
+```
+```input_path```: Path to the original image
+```output_path```: Path to the resized output image
+```resize_ratio```: The factor by which to divide the image dimensions
 ## License
 <p xmlns:cc="http://creativecommons.org/ns#" xmlns:dct="http://purl.org/dc/terms/"><a property="dct:title" rel="cc:attributionURL" href="https://github.com/arvinhm/CellRad-DE">Cell-Level Radiation Dosimetry Explorer (CellRad-DE)</a> by <a rel="cc:attributionURL dct:creator" property="cc:attributionName" href="https://github.com/arvinhm">Arvin Haj-Mirzaian, Victor Valladolid Onecha, Alejandro Bertolet Reina, and Pedram Heidari</a> is licensed under <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/?ref=chooser-v1" target="_blank" rel="license noopener noreferrer" style="display:inline-block;">CC BY-NC-ND 4.0<img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/cc.svg?ref=chooser-v1" alt=""><img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/by.svg?ref=chooser-v1" alt=""><img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/nc.svg?ref=chooser-v1" alt=""><img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/nd.svg?ref=chooser-v1" alt=""></a></p>
