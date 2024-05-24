@@ -1,0 +1,142 @@
+#========================================================================================
+# Verbosity            
+#========================================================================================
+
+/gate/verbose Physic    1
+/gate/verbose Cuts      1
+/gate/verbose SD        0
+/gate/verbose Actions   0
+/gate/verbose Actor     1
+/gate/verbose Step      0
+/gate/verbose Error     1
+/gate/verbose Warning   1
+/gate/verbose Output    1
+/gate/verbose Beam      1
+/gate/verbose Volume    1
+/gate/verbose Image     1
+/gate/verbose Geometry  2
+
+#========================================================================================
+# Geometry             
+#========================================================================================
+# Material database
+/gate/geometry/setMaterialDatabase data/GateMaterials.db
+# Material database
+/gate/world/geometry/setXLength 2 cm
+/gate/world/geometry/setYLength 2 cm
+/gate/world/geometry/setZLength 2 cm
+/gate/world/setMaterial Air
+/gate/world/vis/setVisible 1
+/gate/world/vis/forceWireframe
+
+# Generate materials from Hounsfield units
+/gate/HounsfieldMaterialGenerator/SetMaterialTable data/Schneider2000MaterialsTable.txt
+/gate/HounsfieldMaterialGenerator/SetDensityTable  data/Schneider2000DensitiesTable.txt
+/gate/HounsfieldMaterialGenerator/SetDensityTolerance               0.1 g/cm3
+/gate/HounsfieldMaterialGenerator/SetOutputMaterialDatabaseFilename data/patient-HUmaterials.db
+/gate/HounsfieldMaterialGenerator/SetOutputHUMaterialFilename       data/patient-HU2mat.txt
+/gate/HounsfieldMaterialGenerator/Generate
+
+# Voxelized geometry 
+/gate/world/daughters/name                      phantom
+/gate/world/daughters/insert                    ImageNestedParametrisedVolume
+/gate/geometry/setMaterialDatabase              data/patient-HUmaterials.db
+/gate/phantom/geometry/setHUToMaterialFile      data/patient-HU2mat.txt
+/gate/phantom/geometry/setImage                 data/CT.mhd
+/gate/phantom/vis/forceWireframe
+
+#========================================================================================
+# PHYSICS              
+#========================================================================================
+#emstandard_opt3 is recommended for medical, space 
+# http://geant4.in2p3.fr/IMG/pdf_PhysicsLists.pdf
+/gate/physics/addPhysicsList emstandard_opt3
+/gate/physics/addProcess Decay
+/gate/physics/addProcess RadioactiveDecay
+
+/gate/physics/Gamma/SetCutInRegion      world 1 mm
+/gate/physics/Electron/SetCutInRegion   world 1 mm
+/gate/physics/Positron/SetCutInRegion   world 1 mm
+
+/gate/physics/Gamma/SetCutInRegion      phantom 0.00065 mm
+/gate/physics/Electron/SetCutInRegion   phantom 0.00065 mm
+/gate/physics/Positron/SetCutInRegion   phantom 0.00065 mm
+
+
+#========================================================================================
+# DOSE ACTOR           
+#========================================================================================
+
+/gate/actor/addActor                     DoseActor  dose3D
+/gate/actor/dose3D/save                output/distrib.mhd
+/gate/actor/dose3D/attachTo    	       phantom
+/gate/actor/dose3D/stepHitType           random
+/gate/actor/dose3D/setPosition           0 0 0 cm
+/gate/actor/dose3D/setVoxelSize         0.00065 0.00065 0.00065 mm
+#/gate/actor/dose3D/setSize          	5.525 3.656 mm
+/gate/actor/dose3D/setResolution         8500 5625 1
+/gate/actor/dose3D/saveEveryNSeconds     60
+/gate/actor/dose3D/enableEdep            true
+/gate/actor/dose3D/enableUncertaintyEdep true
+/gate/actor/dose3D/enableDose            true
+/gate/actor/dose3D/enableUncertaintyDose true
+/gate/actor/dose3D/enableNumberOfHits    true
+
+/gate/actor/addActor               SimulationStatisticActor stat
+/gate/actor/stat/save              output/stat.txt
+/gate/actor/stat/saveEveryNSeconds 60
+
+#========================================================================================
+# INITIALIZE           
+#========================================================================================
+
+/gate/run/initialize
+/gate/physics/displayCuts
+
+#========================================================================================
+# SOURCE               
+#========================================================================================
+
+/gate/source/addSource Pb212Source voxel
+/gate/source/Pb212Source/reader/insert image
+
+/gate/source/Pb212Source/imageReader/translator/insert linear
+/gate/source/Pb212Source/imageReader/linearTranslator/setScale 1 Bq
+/gate/source/Pb212Source/imageReader/readFile input/Source_normalized.mhd
+/gate/source/Pb212Source/setPosition -2762.5 -1828.125 -0.325 um
+
+# Define source Lead: Z = 82, A = 212
+/gate/source/Pb212Source/gps/particle ion
+/gate/source/Pb212Source/gps/ion 82 212 0 0
+/gate/source/Pb212Source/gps/angtype iso
+/gate/source/Pb212Source/setForcedUnstableFlag true
+/gate/source/Pb212Source/setForcedHalfLife 38304 s
+/gate/source/Pb212Source/gps/energytype Mono
+/gate/source/Pb212Source/gps/monoenergy 0 keV
+
+# source is now relative to phantom instead of relative to world
+/gate/source/Pb212Source/attachTo phantom
+
+# To enable information output of source 
+/gate/source/Pb212Source/dump 1
+
+# Gives a list of all defined sources. In this example only 1 source
+/gate/source/list
+
+
+
+
+#========================================================================================
+# START
+#========================================================================================
+
+
+/gate/random/setEngineName MersenneTwister
+/gate/random/setEngineSeed auto
+
+#/tracking/verbose 1
+
+/gate/application/setTotalNumberOfPrimaries 1000000000
+
+/gate/application/start
+
