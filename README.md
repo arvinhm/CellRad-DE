@@ -51,6 +51,19 @@ python setup.py create_conda_env
 conda activate CellRad-DE
 pip install -e .
 ```
+##### Apple silicon M1/M2/M3 installation
+Apple Silicon users might encounter package conflicts with DeepCell and TensorFlow. Follow the instructions below to successfully install the software using Docker.
+
+Please download and install Docker Desktop for Mac from Docker's official website (https://www.docker.com/products/docker-desktop).
+Make sure Docker is runing and run below code.
+```bash
+conda activate CellRad-DE
+docker pull tensorflow/tensorflow:2.8.0
+docker run -it tensorflow/tensorflow:2.8.0 bash
+#Inside the interactive terminal session of the Docker container, run:
+pip install deepcell==0.12.9
+```
+Now, you should be able to use CellRad-DE. If you encounter any issues, we would be more than happy to assist you.
 
 ### Inputs and data preparation
 This toolkit is compatible with any type of high-dimensional multiplexed images of any size. However, for very large image sizes, we recommend considering the use of a server cluster to ensure optimal performance.
