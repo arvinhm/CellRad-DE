@@ -69,8 +69,11 @@ resize('path/to/image.ome.tif', 'path/to/output.ome.tif', 2)
 ```output_path```: Path to the resized output image
 ```resize_ratio```: The factor by which to divide the image dimensions
 #### segment_cells
-In this dunction by levearing a deep learning model (https://github.com/vanvalenlab/intro-to-deepcell) we were able to segment cell based on DNA channel (DAPI) and a memrbane (recommended) or cytoplams marker.
-Greenwald, N.F., Miller, G., Moen, E., Kong, A., Kagel, A., Dougherty, T., Fullaway, C.C., McIntosh, B.J., Leow, K.X., Schwartz, M.S. and Pavelchek, C., 2022. Whole-cell segmentation of tissue images with human-level performance using large-scale data annotation and deep learning. Nature biotechnology, 40(4), pp.555-565.
+In this function, by leveraging a deep learning model ([Deepcell](https://github.com/vanvalenlab/intro-to-deepcell)), we were able to segment cells based on the DNA channel (DAPI) and a membrane (recommended) or cytoplasm marker.
+
+<sub><i> 1. Greenwald, N.F., Miller, G., Moen, E., Kong, A., Kagel, A., Dougherty, T., Fullaway, C.C., McIntosh, B.J., Leow, K.X., Schwartz, M.S., and Pavelchek, C., 2022. Whole-cell segmentation of tissue images with human-level performance using large-scale data annotation and deep learning. Nature Biotechnology, 40(4), pp.555-565.</i></sub>
+
+
 ```bash
 segment_cells(input_path, output_path, dapi_idx, membrane_idx, pixel_size, token)
 Example:
