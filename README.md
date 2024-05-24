@@ -23,7 +23,7 @@ Arvin Haj-Mirzaian; Victor Valladolid Onecha; Alejandro Bertolet Reina; Pedram H
 
 ## Step-by-Step Tutorial
 ### Installation
-#### Step 1: Install Conda or Miniconda
+#### Step 1: Install Miniconda
   - Install Miniconda
     Download the Miniconda installer for your operating system from the Miniconda download page (https://docs.anaconda.com/free/miniconda/index.html).
     Run the installer and follow the installation instructions.
