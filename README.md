@@ -43,14 +43,27 @@ Download the Git for Windows installer from the Git for Windows download page (h
 Run the installer and follow the installation instructions.
 
 #### Step 3: Clone the Repository and installation
-  The installation autmatically create a conda enviroment named 'CellRad-DE'. Open a terminal (or Git Bash on Windows) and run the following command:
+Installation autmatically create a conda enviroment named 'CellRad-DE'. Open a terminal (or Git Bash on Windows) and run the following command:
 ```bash
 git clone https://github.com/arvinhm/CellRad-DE.git
 cd CellRad-DE
 python setup.py create_conda_env
 conda activate CellRad-DE
 ```
+
+### Inputs and data preparation
+This toolkit is compatible with any tipe of high dimensional multiplexed images with any size. However for huge image sized we recommand conisdarion rn this toolkit in server cluster. 
+In addition to image (typicall in *.ome.tif fomrat), two csv files are required fot this toolkit to predict the cell type annotation. Please see the example file in 'examples' foilder. 'markers' csv file should descripe all markers used for multiplex imaging (please rename all DNA channels to DAPI, even it is stained for something else than DAPI, the softare understand nuclei channel as DAPI). software
+
 ### Functions
+For step by step tutroial please follow the notebook in 'notebooks' folder. Below are description of each function used in this tool kit.
+
+- resize
+usage:
+```bash
+resize(input_path, output_path, resize_ratio)
+# Example
+resize('TNPCRC_14/TNPCRC_14.ome.tif', 'TNPCRC_14/TNPCRC_14_half.ome.tif', 2)
 
 ## License
 <p xmlns:cc="http://creativecommons.org/ns#" xmlns:dct="http://purl.org/dc/terms/"><a property="dct:title" rel="cc:attributionURL" href="https://github.com/arvinhm/CellRad-DE">Cell-Level Radiation Dosimetry Explorer (CellRad-DE)</a> by <a rel="cc:attributionURL dct:creator" property="cc:attributionName" href="https://github.com/arvinhm">Arvin Haj-Mirzaian, Victor Valladolid Onecha, Alejandro Bertolet Reina, and Pedram Heidari</a> is licensed under <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/?ref=chooser-v1" target="_blank" rel="license noopener noreferrer" style="display:inline-block;">CC BY-NC-ND 4.0<img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/cc.svg?ref=chooser-v1" alt=""><img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/by.svg?ref=chooser-v1" alt=""><img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/nc.svg?ref=chooser-v1" alt=""><img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/nd.svg?ref=chooser-v1" alt=""></a></p>
