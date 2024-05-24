@@ -29,16 +29,16 @@ Arvin Haj-Mirzaian; Victor Valladolid Onecha; Alejandro Bertolet Reina; Pedram H
     Run the installer and follow the installation instructions.
 
 - Step 2: Install Git
-  - Linux:
+    Linux:
 ```bash
 sudo apt-get update
 sudo apt-get install git -y
 ```
-  - macOS:
+    macOS:
 ```bash
 brew install git
 ```
-  - Windows:
+    Windows:
 Download the Git for Windows installer from the Git for Windows download page (https://git-scm.com/downloads).
 Run the installer and follow the installation instructions.
 
