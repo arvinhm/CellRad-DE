@@ -248,7 +248,7 @@ def create_3d_model(image_path, mask_path, output_dir, channels, use_mask, pixel
 
 
 #######################################################################################  
-############## TISSUE CONTOURING adn NUCLEI EXTARCTION ############## 
+############## TISSUE CONTOURING AND NUCLEI EXTRACTION ############## 
 ####################################################################################### 
 
 
