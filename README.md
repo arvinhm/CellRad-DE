@@ -21,5 +21,70 @@ CellRad-DE is a toolkit for advancing the understanding of cellular damage from 
 ## Contributors
 Arvin Haj-Mirzaian; Victor Valladolid Onecha; Alejandro Bertolet Reina; Pedram Heidari
 
+## Step-by-Step Tutorial
+**Install**
+- Step 1: Install Conda or Miniconda
+  - Install Miniconda
+    Download the Miniconda installer for your operating system from the Miniconda download page (https://docs.anaconda.com/free/miniconda/index.html).
+    Run the installer and follow the installation instructions.
+
+- Step 2: Install Git
+  - Linux:
+```bash
+sudo apt-get update
+sudo apt-get install git -y
+- macOS:
+```bash
+brew install git
+- Windows:
+```bash
+Download the Git for Windows installer from the Git for Windows download page (https://git-scm.com/downloads).
+Run the installer and follow the installation instructions.
+
+- Step 3: Clone the Repository
+  Open a terminal (or Git Bash on Windows) and run the following command:
+```bash
+git clone https://github.com/arvinhm/CellRad-DE.git
+
+Step 4: Change Directory to the Cloned Repository
+Navigate to the cloned repository directory:
+
+bash
+Copy code
+cd CellRad-DE
+Step 5: Run the Setup Script to Create Conda Environment
+Run the setup script to create the Conda environment and install the required packages:
+
+bash
+Copy code
+python setup.py create_conda_env
+Full Instructions Recap
+Install Miniconda:
+
+Download from Miniconda download page.
+Run the installer and follow the instructions.
+Install Git:
+
+Linux: sudo apt-get install git -y
+macOS: brew install git
+Windows: Download and install from Git for Windows.
+Clone the Repository:
+
+bash
+Copy code
+git clone https://github.com/arvinhm/CellRad-DE.git
+Change Directory:
+
+bash
+Copy code
+cd CellRad-DE
+Run Setup Script:
+
+bash
+Copy code
+python setup.py create_conda_env
+This tutorial will guide users through installing Miniconda, G
+
+
 ## License
 <p xmlns:cc="http://creativecommons.org/ns#" xmlns:dct="http://purl.org/dc/terms/"><a property="dct:title" rel="cc:attributionURL" href="https://github.com/arvinhm/CellRad-DE">Cell-Level Radiation Dosimetry Explorer (CellRad-DE)</a> by <a rel="cc:attributionURL dct:creator" property="cc:attributionName" href="https://github.com/arvinhm">Arvin Haj-Mirzaian, Victor Valladolid Onecha, Alejandro Bertolet Reina, and Pedram Heidari</a> is licensed under <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/?ref=chooser-v1" target="_blank" rel="license noopener noreferrer" style="display:inline-block;">CC BY-NC-ND 4.0<img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/cc.svg?ref=chooser-v1" alt=""><img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/by.svg?ref=chooser-v1" alt=""><img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/nc.svg?ref=chooser-v1" alt=""><img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/nd.svg?ref=chooser-v1" alt=""></a></p>
