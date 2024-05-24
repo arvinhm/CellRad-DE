@@ -28,6 +28,7 @@ class CreateCondaEnv(Command):
             "scikit-image",
             "anndata",
             "jupyter",
+            "imagecodecs",
             "scanpy",
             "scimap"
             # phenotype-cells is your custom package, handle it separately if needed
@@ -75,6 +76,7 @@ with open('requirements.txt', 'w') as f:
         "scikit-image",
         "anndata",
         "jupyter",
+        "imagecodecs",
         "scanpy",
         "scimap"
     ]))
