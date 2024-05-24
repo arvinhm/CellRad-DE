@@ -69,10 +69,9 @@ resize('path/to/image.ome.tif', 'path/to/output.ome.tif', 2)
 ```output_path```: Path to the resized output image
 ```resize_ratio```: The factor by which to divide the image dimensions
 #### segment_cells
-In this function, by leveraging a deep learning model ([Deepcell](https://github.com/vanvalenlab/intro-to-deepcell) <sup>1</sup>), we were able to segment cells based on the DNA channel (DAPI) and a membrane (recommended) or cytoplasm marker.
+In this function, by leveraging a deep learning model ([Deepcell](https://github.com/vanvalenlab/intro-to-deepcell) <sup>1</sup>), users are able to segment cells based on the DNA channel (DAPI) and a membrane (recommended) or cytoplasm marker.
 
 <sub><i> 1. Greenwald, N.F., Miller, G., Moen, E., Kong, A., Kagel, A., Dougherty, T., Fullaway, C.C., McIntosh, B.J., Leow, K.X., Schwartz, M.S., and Pavelchek, C., 2022. Whole-cell segmentation of tissue images with human-level performance using large-scale data annotation and deep learning. Nature Biotechnology, 40(4), pp.555-565.</i></sub>
-
 
 ```bash
 segment_cells(input_path, output_path, dapi_idx, membrane_idx, pixel_size, token)
@@ -86,6 +85,22 @@ segment_cells('path/to/origina_image.ome.tif', 'path/to/cell_segmentation.ome.ti
 ```membrane_idx```: : The channel numebr where memraben or cytoplasm is (chhanel number starts from 0)
 ```pixel_size```: Pixel size; it has two parameter if user choose 'auto'  it automatically find pixel size from ome.tif file or user can enter it manually i.e. '0.325'
 ```token```: This funcction required a token from deepcell. User can sign up https://datasets.deepcell.org/join and get their own token. 
+
+#### extract_single_cell_data
+This function extarcts all cells information incdluding location and size of the cells as well as marker experesion in each cell and save the outputs as cell_data.csv, and cell_data.h5ad, cell_data_spatial.npy.
+
+```bash
+extract_single_cell_data(masks, image, channel_names, output_dir)
+Example:
+extract_single_cell_data(masks='path/to/cell_segmentation.ome.tif', image='path/to/origina_image.ome.tif', channel_names='path/to/.csv', output_dir='path/to/output')
+```
+
+```masks```: Path to the predicted cell segmentation from previous function
+```image```: Path to the original image
+```channel_names```: Path to markers.csv (described previously)
+```output_dir```: : Path to the output files
+
+
 
 ## License
 <p xmlns:cc="http://creativecommons.org/ns#" xmlns:dct="http://purl.org/dc/terms/"><a property="dct:title" rel="cc:attributionURL" href="https://github.com/arvinhm/CellRad-DE">Cell-Level Radiation Dosimetry Explorer (CellRad-DE)</a> by <a rel="cc:attributionURL dct:creator" property="cc:attributionName" href="https://github.com/arvinhm">Arvin Haj-Mirzaian, Victor Valladolid Onecha, Alejandro Bertolet Reina, and Pedram Heidari</a> is licensed under <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/?ref=chooser-v1" target="_blank" rel="license noopener noreferrer" style="display:inline-block;">CC BY-NC-ND 4.0<img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/cc.svg?ref=chooser-v1" alt=""><img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/by.svg?ref=chooser-v1" alt=""><img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/nc.svg?ref=chooser-v1" alt=""><img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/nd.svg?ref=chooser-v1" alt=""></a></p>
