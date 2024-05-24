@@ -28,6 +28,7 @@ class CreateCondaEnv(Command):
             "scikit-image",
             "anndata",
             "jupyter",
+            "ipykernel",
             "imagecodecs",
             "scanpy",
             "scimap"
@@ -76,6 +77,7 @@ with open('requirements.txt', 'w') as f:
         "scikit-image",
         "anndata",
         "jupyter",
+        "ipykernel",
         "imagecodecs",
         "scanpy",
         "scimap"
