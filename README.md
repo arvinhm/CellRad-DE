@@ -22,27 +22,27 @@ CellRad-DE is a toolkit for advancing the understanding of cellular damage from 
 Arvin Haj-Mirzaian; Victor Valladolid Onecha; Alejandro Bertolet Reina; Pedram Heidari
 
 ## Step-by-Step Tutorial
-**Installation**
-- Step 1: Install Conda or Miniconda
+### Installation
+#### Step 1: Install Conda or Miniconda
   - Install Miniconda
     Download the Miniconda installer for your operating system from the Miniconda download page (https://docs.anaconda.com/free/miniconda/index.html).
     Run the installer and follow the installation instructions.
 
-- Step 2: Install Git
-    Linux:
+#### Step 2: Install Git
+##### Linux:
 ```bash
 sudo apt-get update
 sudo apt-get install git -y
 ```
-    macOS:
+##### macOS:
 ```bash
 brew install git
 ```
-    Windows:
+##### Windows:
 Download the Git for Windows installer from the Git for Windows download page (https://git-scm.com/downloads).
 Run the installer and follow the installation instructions.
 
-- Step 3: Clone the Repository and installation
+#### Step 3: Clone the Repository and installation
   The installation autmatically create a conda enviroment named 'CellRad-DE'. Open a terminal (or Git Bash on Windows) and run the following command:
 ```bash
 git clone https://github.com/arvinhm/CellRad-DE.git
@@ -50,7 +50,7 @@ cd CellRad-DE
 python setup.py create_conda_env
 conda activate CellRad-DE
 ```
-**Functions**
+### Functions
 
 ## License
 <p xmlns:cc="http://creativecommons.org/ns#" xmlns:dct="http://purl.org/dc/terms/"><a property="dct:title" rel="cc:attributionURL" href="https://github.com/arvinhm/CellRad-DE">Cell-Level Radiation Dosimetry Explorer (CellRad-DE)</a> by <a rel="cc:attributionURL dct:creator" property="cc:attributionName" href="https://github.com/arvinhm">Arvin Haj-Mirzaian, Victor Valladolid Onecha, Alejandro Bertolet Reina, and Pedram Heidari</a> is licensed under <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/?ref=chooser-v1" target="_blank" rel="license noopener noreferrer" style="display:inline-block;">CC BY-NC-ND 4.0<img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/cc.svg?ref=chooser-v1" alt=""><img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/by.svg?ref=chooser-v1" alt=""><img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/nc.svg?ref=chooser-v1" alt=""><img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/nd.svg?ref=chooser-v1" alt=""></a></p>
