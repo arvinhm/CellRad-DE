@@ -52,7 +52,7 @@ conda activate CellRad-DE
 pip install -e .
 ```
 ##### Apple silicon M1/M2/M3
-Apple Silicon users might encounter issues during installation due to package conflicts with Deepcell and TensorFlow.
+Apple silicon users might encounter issues during installation due to package conflicts with Deepcell and TensorFlow.
 
 ### Inputs and data preparation
 This toolkit is compatible with any type of high-dimensional multiplexed images of any size. However, for very large image sizes, we recommend considering the use of a server cluster to ensure optimal performance.
