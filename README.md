@@ -33,57 +33,23 @@ Arvin Haj-Mirzaian; Victor Valladolid Onecha; Alejandro Bertolet Reina; Pedram H
 ```bash
 sudo apt-get update
 sudo apt-get install git -y
+```
 - macOS:
 ```bash
 brew install git
+```
 - Windows:
-```bash
 Download the Git for Windows installer from the Git for Windows download page (https://git-scm.com/downloads).
 Run the installer and follow the installation instructions.
 
-- Step 3: Clone the Repository
-  Open a terminal (or Git Bash on Windows) and run the following command:
+- Step 3: Clone the Repository and installation
+  The installation autmatically create a conda enviroment named 'CellRad-DE'. Open a terminal (or Git Bash on Windows) and run the following command:
 ```bash
 git clone https://github.com/arvinhm/CellRad-DE.git
-
-Step 4: Change Directory to the Cloned Repository
-Navigate to the cloned repository directory:
-
-bash
-Copy code
 cd CellRad-DE
-Step 5: Run the Setup Script to Create Conda Environment
-Run the setup script to create the Conda environment and install the required packages:
-
-bash
-Copy code
 python setup.py create_conda_env
-Full Instructions Recap
-Install Miniconda:
-
-Download from Miniconda download page.
-Run the installer and follow the instructions.
-Install Git:
-
-Linux: sudo apt-get install git -y
-macOS: brew install git
-Windows: Download and install from Git for Windows.
-Clone the Repository:
-
-bash
-Copy code
-git clone https://github.com/arvinhm/CellRad-DE.git
-Change Directory:
-
-bash
-Copy code
-cd CellRad-DE
-Run Setup Script:
-
-bash
-Copy code
-python setup.py create_conda_env
-This tutorial will guide users through installing Miniconda, G
+conda activate CellRad-DE
+```
 
 
 ## License
