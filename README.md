@@ -49,6 +49,7 @@ git clone https://github.com/arvinhm/CellRad-DE.git
 cd CellRad-DE
 python setup.py create_conda_env
 conda activate CellRad-DE
+pip install -e .
 ```
 
 ### Inputs and data preparation
