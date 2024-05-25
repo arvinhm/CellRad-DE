@@ -19,7 +19,6 @@ CellRad-DE is a toolkit for advancing the understanding of cellular damage from 
 - Assess potential DNA damage across various cell types, aiding in developing more effective and personalized radionuclide therapies.
 
 ## Contributors
-Arvin Haj-Mirzaian; Victor Valladolid Onecha; Alejandro Bertolet Reina; Umar Mahmood; Pedram Heidari
 
 ## Step-by-Step Tutorial
 ### Installation
