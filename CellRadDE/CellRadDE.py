@@ -195,8 +195,8 @@ def segment_cells(input_path, output_path, dapi_idx, membrane_idx, pixel_size, t
 #segment_cells(input_path, output_path, dapi_idx, membrane_idx, pixel_size, token)
 
 def visualization(image_path, mask_path):
-    multiplex_image = tifffile.imread(image_path)
-    cell_mask = tifffile.imread(mask_path)
+    multiplex_image = tf.imread(image_path)
+    cell_mask = tf.imread(mask_path)
     viewer = napari.Viewer()
     if multiplex_image.ndim == 3 and multiplex_image.shape[0] > 1:
         for i in range(multiplex_image.shape[0]):
@@ -474,7 +474,7 @@ def extract_single_cell_data(mask_path, image_path, channel_names_path, output_d
     channel_names_df = channel_names_df[channel_names_df['marker_name'] != 'DAPI']
     channel_names = channel_names_df['marker_name'].tolist()
 
-    image_data = tifffile.imread(image_path)
+    image_data = tf.imread(image_path)
     if len(image_data.shape) != 3:
         raise ValueError("Expected image_data to be a 3D array with shape (channels, height, width)")
 
@@ -590,13 +590,13 @@ def celltype_prediction(adata_path, marker_csv_path, mask_path, output_path):
     colorized_mask = color_map[mask_data]
 
     colorized_mask_path = Path(output_path) / 'colorized_mask.tif'
-    tifffile.imsave(colorized_mask_path, colorized_mask)
+    tf.imsave(colorized_mask_path, colorized_mask)
 
     for phenotype in unique_phenotypes:
         binary_mask = np.isin(mask_data, phenotypes.index[phenotypes['phenotype'] == phenotype].astype(int))
         binary_mask = (binary_mask * 255).astype(np.uint8)
         binary_output_path = Path(output_path) / f'binary_mask_{phenotype}.tif'
-        tifffile.imsave(binary_output_path, binary_mask)
+        tf.imsave(binary_output_path, binary_mask)
 
     plt.figure(figsize=(10, 10))
     plt.imshow(colorized_mask)
@@ -633,9 +633,9 @@ def nuclei_celltype(tumor_mask_path, nuclei_mask_path, output_path):
     Returns:
     combined_mask (numpy.ndarray): The resulting mask with nuclei regions within the tumor.
     """
-    tumor_mask = tifffile.imread(tumor_mask_path).astype(bool)
+    tumor_mask = tf.imread(tumor_mask_path).astype(bool)
 
-    nuclei_mask = tifffile.imread(nuclei_mask_path).astype(bool)
+    nuclei_mask = tf.imread(nuclei_mask_path).astype(bool)
 
     if tumor_mask.shape != nuclei_mask.shape:
         raise ValueError("The dimensions of the tumor mask and nuclei mask do not match.")
@@ -643,7 +643,7 @@ def nuclei_celltype(tumor_mask_path, nuclei_mask_path, output_path):
     combined_mask = np.zeros_like(nuclei_mask, dtype=np.uint8)
     combined_mask[nuclei_mask & tumor_mask] = 255
 
-    tifffile.imwrite(output_path, combined_mask)
+    tf.imwrite(output_path, combined_mask)
 
     return combined_mask
 
