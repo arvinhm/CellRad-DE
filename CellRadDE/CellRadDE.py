@@ -528,8 +528,8 @@ def extract_single_cell_data(mask_path, image_path, channel_names_path, output_d
 def create_color_map(unique_phenotypes):
     """Generate a specific color for each phenotype using the Set1 colormap."""
     num_phenotypes = len(unique_phenotypes)
-    color_map = plt.cm.get_cmap('Set1', num_phenotypes)  
-    colors = [color_map(i) for i in range(num_phenotypes)]  
+    color_map = plt.get_cmap('Set1', num_phenotypes)
+    colors = [color_map(i) for i in range(num_phenotypes)]
     return dict(zip(unique_phenotypes, (np.array(colors)[:, :3] * 255).astype(np.uint8)))
 
 def celltype_prediction(adata_path, marker_csv_path, mask_path, output_path):
@@ -590,13 +590,13 @@ def celltype_prediction(adata_path, marker_csv_path, mask_path, output_path):
     colorized_mask = color_map[mask_data]
 
     colorized_mask_path = Path(output_path) / 'colorized_mask.tif'
-    tf.imsave(colorized_mask_path, colorized_mask)
+    tf.imwrite(colorized_mask_path, colorized_mask)
 
     for phenotype in unique_phenotypes:
         binary_mask = np.isin(mask_data, phenotypes.index[phenotypes['phenotype'] == phenotype].astype(int))
         binary_mask = (binary_mask * 255).astype(np.uint8)
         binary_output_path = Path(output_path) / f'binary_mask_{phenotype}.tif'
-        tf.imsave(binary_output_path, binary_mask)
+        tf.imwrite(binary_output_path, binary_mask)
 
     plt.figure(figsize=(10, 10))
     plt.imshow(colorized_mask)
