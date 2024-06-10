@@ -395,8 +395,6 @@ def nuclei_mask(input_file, output_path, channel, threshold_value=5000):
 #######################################################################################  
 ############## CREATE A 3D MODEL FOR CT IMAGE BASED ON WHOLE TISSUE MASK ############## 
 ####################################################################################### 
-
-
 def write_mhd(filename, dim_size, element_spacing, element_type, data_file):
     """Writes an MHD file with the specified parameters."""
     mhd_content = f"""NDims = 3
@@ -423,22 +421,28 @@ def extract_pixel_size(metadata):
     except (AttributeError, TypeError):
         raise ValueError("Pixel size information is missing in the OME-TIFF file metadata.")
 
-def ct_scan(mask_path, ome_tiff_path, output_dir):
+def ct_scan(mask_path, ome_tiff_path, output_dir, pixel_size='auto'):
     """Processes the binary mask and raw OME-TIFF file to create a CT image and MHD file."""
 
     Path(output_dir).mkdir(parents=True, exist_ok=True)
 
-    with tifffile.TiffFile(mask_path) as tif:
+    with tf.TiffFile(mask_path) as tif:
         mask = tif.asarray().astype(bool)
 
-    with tifffile.TiffFile(ome_tiff_path) as tif:
+    with tf.TiffFile(ome_tiff_path) as tif:
         ome_metadata = tif.ome_metadata
-        pixel_size = extract_pixel_size(ome_metadata)
-
+        if pixel_size == 'auto':
+            if ome_metadata is None:
+                raise ValueError("OME metadata is missing in the OME-TIFF file.")
+            pixel_size = extract_pixel_size(ome_metadata)
+        else:
+            if not isinstance(pixel_size, tuple) or len(pixel_size) != 3:
+                raise ValueError("Pixel size must be a tuple with three elements (size_x, size_y, size_z).")
+            pixel_size = tuple(pixel_size)
 
     CT_image = np.full(mask.shape, -1050, dtype=np.int16)
 
-    CT_image[mask] = 19 # soft tissue is 19
+    CT_image[mask] = 19  # soft tissue is 19
 
     raw_file_path = Path(output_dir) / 'CT.raw'
     with open(raw_file_path, 'wb') as file:
@@ -452,11 +456,14 @@ def ct_scan(mask_path, ome_tiff_path, output_dir):
 
     print(f"CT image and MHD file saved to {output_dir}")
 
+# Example call to the function
+#mask_path = r'c:\Users\Yue\Desktop\FINAL_MC\BEMS340264_Scene-002\tissue_mask.tif'
+#ome_tiff_path = r'c:\Users\Yue\Desktop\FINAL_MC\BEMS340264_Scene-002_subtracted.ome.tif'
+#output_dir = r'c:\Users\Yue\Desktop\FINAL_MC\BEMS340264_Scene-002'
+#pixel_size = (0.00065, 0.00065, 0.001)  # Set to 'auto' or specify a manual size, e.g., (0.00065, 0.00065, 0.001)
+#ct_scan(mask_path, ome_tiff_path, output_dir, pixel_size)
 
-#mask_path = 'processing\\tissue_mask.tif'
-#ome_tiff_path = 'processing\\BEMS340264_Scene-002.ome.tif'
-#output_dir = 'processing\\CT'
-#ct_scan(mask_path, ome_tiff_path, output_dir)
+
 
 # extract_single_cell_data
 
