@@ -103,19 +103,6 @@ def resize(input_path, output_path, resize_ratio):
 #resize(input_path, output_path, resize_ratio)
 
 
-def extract_pixel_size(file_path):
-    """Extracts the pixel size from an OME-TIFF file."""
-    ome_data = from_tiff(file_path)
-    pixels = ome_data.images[0].pixels
-    size_x = pixels.physical_size_x  # In microns
-    size_y = pixels.physical_size_y  # In microns
-    size_z = pixels.physical_size_z or 1  # In microns, default Z size is 1 if not provided
-    resolution_x = pixels.size_x
-    resolution_y = pixels.size_y
-    if not size_x or not size_y:
-        raise ValueError("No pixel size detected in metadata. Please enter manually.")
-    return size_x, size_y, size_z, resolution_x, resolution_y
-
 def segment_cells(input_path, output_path, dapi_idx, membrane_idx, pixel_size, token):
     os.environ['DEEPCELL_ACCESS_TOKEN'] = token
     def read_ome_tiff(file_path):
@@ -409,19 +396,6 @@ ElementDataFile = {data_file}
     with open(filename, 'w') as file:
         file.write(mhd_content)
 
-def extract_pixel_size(metadata):
-    """Extracts the pixel size from OME metadata."""
-    root = ET.fromstring(metadata)
-    namespace = {'ome': 'http://www.openmicroscopy.org/Schemas/OME/2016-06'}
-    try:
-        pixels = root.find('.//ome:Pixels', namespace)
-        size_x = float(pixels.get('PhysicalSizeX')) / 1000
-        size_y = float(pixels.get('PhysicalSizeY')) / 1000
-        size_z = float(pixels.get('PhysicalSizeZ', 1)) / 1000  # default Z size is 1 if not provided
-        return size_x, size_y, size_z
-    except (AttributeError, TypeError):
-        raise ValueError("Pixel size information is missing in the OME-TIFF file metadata.")
-
 def ct_scan(mask_path, ome_tiff_path, output_dir, pixel_size='auto'):
     """Processes the binary mask and raw OME-TIFF file to create a CT image and MHD file."""
 
@@ -654,19 +628,6 @@ def nuclei_celltype(tumor_mask_path, nuclei_mask_path, output_path):
 
 #combined_mask = nuclei_celltype(tumor_mask_path, nuclei_mask_path, output_path)
 
-
-
-
-def extract_pixel_size(file_path):
-    """Extracts the pixel size from an OME-TIFF file."""
-    ome_data = from_tiff(file_path)
-    pixels = ome_data.images[0].pixels
-    size_x = pixels.physical_size_x  # In microns
-    size_y = pixels.physical_size_y  # In microns
-    size_z = pixels.physical_size_z or 1  # In microns, default Z size is 1 if not provided
-    resolution_x = pixels.size_x
-    resolution_y = pixels.size_y
-    return size_x, size_y, size_z, resolution_x, resolution_y
 
 def update_mac_file(file_path, output_dir, size_x, size_y, size_z, resolution_x, resolution_y):
     with open(file_path, 'r') as file:
