@@ -22,7 +22,7 @@ import shutil
 import subprocess
 import tempfile
 
-def substract_background(input_path, output_path, fiji_path, radius=30):
+def subtract_background(input_path, output_path, fiji_path, radius=30):
     # Ensure the paths are absolute
     input_path = os.path.abspath(input_path)
     output_path = os.path.abspath(output_path)
@@ -73,7 +73,7 @@ def substract_background(input_path, output_path, fiji_path, radius=30):
 #fiji_path = r'c:\Users\Yue\Desktop\Fiji.app\ImageJ-win64.exe'  # Adjust this path to your Fiji installation
 
 # Call the function
-#substract_background(input_path, output_path, fiji_path, radius=30)
+#subtract_background(input_path, output_path, fiji_path, radius=30)
 
 def resize(input_path, output_path, resize_ratio):
     with tf.TiffFile(input_path) as tif:
