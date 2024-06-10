@@ -19,8 +19,61 @@ import scimap as sm
 import json
 from phenotype_cells import phenotype_cells, load_marker_dict_from_csv
 import shutil
+import subprocess
+import tempfile
 
+def substract_background(input_path, output_path, fiji_path, radius=30):
+    # Ensure the paths are absolute
+    input_path = os.path.abspath(input_path)
+    output_path = os.path.abspath(output_path)
+    fiji_path = os.path.abspath(fiji_path)
+    
+    # Check if the input file exists
+    if not os.path.exists(input_path):
+        raise FileNotFoundError(f"Input file not found at {input_path}. Please ensure the path is correct.")
+    
+    # Check if the Fiji executable exists
+    if not os.path.exists(fiji_path):
+        raise FileNotFoundError(f"Fiji executable not found at {fiji_path}. Please ensure the path is correct.")
+    
+    # Create the macro content using string concatenation
+    macro_content = (
+        'open("' + input_path.replace('\\', '\\\\') + '");\n' +
+        'run("Subtract Background...", "rolling=' + str(radius) + ' stack");\n' +
+        'saveAs("Tiff", "' + output_path.replace('\\', '\\\\') + '");\n' +
+        'close();\n'
+    )
+    
+    # Create a temporary macro file
+    with tempfile.NamedTemporaryFile(delete=False, suffix='.ijm') as temp_macro:
+        temp_macro.write(macro_content.encode())
+        temp_macro_path = temp_macro.name
+    
+    print(f"Temporary macro file created at {temp_macro_path}")
+    
+    # Run ImageJ with the macro
+    result = subprocess.run([fiji_path, "--headless", "--run", temp_macro_path], capture_output=True, text=True)
+    
+    # Print the output from the subprocess
+    print(result.stdout)
+    print(result.stderr)
+    
+    # Clean up the temporary macro file
+    os.remove(temp_macro_path)
+    print(f"Temporary macro file {temp_macro_path} deleted")
 
+    # Check if the output file was created
+    if os.path.exists(output_path):
+        print(f"Output file created successfully at {output_path}")
+    else:
+        print(f"Output file was not created at {output_path}")
+
+#input_path = r'c:\Users\Yue\Desktop\FINAL_MC\BEMS340264_Scene-002_half.ome.tif'
+#output_path = r'c:\Users\Yue\Desktop\FINAL_MC\BEMS340264_Scene-002_subtracted.ome.tif'
+#fiji_path = r'c:\Users\Yue\Desktop\Fiji.app\ImageJ-win64.exe'  # Adjust this path to your Fiji installation
+
+# Call the function
+#substract_background(input_path, output_path, fiji_path, radius=30)
 
 def resize(input_path, output_path, resize_ratio):
     with tf.TiffFile(input_path) as tif:
