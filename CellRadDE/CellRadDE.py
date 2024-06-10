@@ -17,6 +17,7 @@ import anndata
 import scanpy as sc
 import scimap as sm
 import json
+from matplotlib.patches import Patch
 from phenotype_cells import phenotype_cells, load_marker_dict_from_csv
 import shutil
 import subprocess
