@@ -240,13 +240,12 @@ def extract_pixel_size(metadata):
 
 def create_3d_model(image_path, mask_path, output_dir, channels, use_mask, pixel_size='auto', activity=1):
 
-    with tifffile.TiffFile(image_path) as tif:
+    with tf.TiffFile(image_path) as tif:
         images = tif.asarray()
         metadata = tif.ome_metadata
 
-
     if use_mask:
-        with tifffile.TiffFile(mask_path) as tif:
+        with tf.TiffFile(mask_path) as tif:
             mask = tif.asarray().astype(bool)
 
     images = images.astype(np.float32)
@@ -288,6 +287,7 @@ def create_3d_model(image_path, mask_path, output_dir, channels, use_mask, pixel
         total_a_file_path = os.path.join(channel_dir, 'Total_A_Bq.txt')
         with open(total_a_file_path, 'w') as file:
             file.write(f'{(total_A / activity):.2f}')
+
 
 #image_path = 'processing\\BEMS340264_Scene-002.ome.tif'
 #mask_path = 'processing\\masks\\binary_mask_Cancer cell.tif'  # path to the binary mask file
