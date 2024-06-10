@@ -203,7 +203,7 @@ def visualization(image_path, mask_path):
 
 def write_mhd(filename, dim_size, element_spacing, element_type, data_file):
     mhd_content = f"""NDims = 3
-DimSize = {dim_size[1]} {dim_size[0]} {dim_size[2]}
+DimSize = {dim_size[0]} {dim_size[1]} {dim_size[2]}
 ElementSpacing = {element_spacing[0]} {element_spacing[1]} {element_spacing[2]}
 ElementNumberOfChannels = 1
 ElementByteOrderMSB = False
