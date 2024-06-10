@@ -318,7 +318,7 @@ def tissue_mask(input_file, output_path, channel, threshold_value=5000):
     Returns:
     mask (numpy.ndarray): The generated mask with contours around the tissue.
     """
-    image = tiff.imread(input_file)
+    image = tf.imread(input_file)
 
     if image is None:
         raise ValueError("Image could not be loaded, check the file path and format")
@@ -330,21 +330,17 @@ def tissue_mask(input_file, output_path, channel, threshold_value=5000):
 
     _, thresh = cv2.threshold(image_channel, threshold_value, 65535, cv2.THRESH_BINARY)
 
-
     thresh = np.uint8(thresh / 255)
-
 
     kernel = np.ones((25, 25), np.uint8)
     dilated = cv2.dilate(thresh, kernel, iterations=2)
 
-
     contours, _ = cv2.findContours(dilated, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-
 
     mask = np.zeros_like(image_channel, dtype=np.uint8)
     cv2.drawContours(mask, contours, -1, 255, thickness=cv2.FILLED)
 
-    tiff.imwrite(output_path, mask)
+    tf.imwrite(output_path, mask)
 
     return mask
 
@@ -361,7 +357,7 @@ def nuclei_mask(input_file, output_path, channel, threshold_value=5000):
     Returns:
     mask (numpy.ndarray): The generated mask for the nuclei.
     """
-    image = tiff.imread(input_file)
+    image = tf.imread(input_file)
 
     if image is None:
         raise ValueError("Image could not be loaded, check the file path and format")
@@ -380,10 +376,9 @@ def nuclei_mask(input_file, output_path, channel, threshold_value=5000):
     mask = np.zeros_like(image_channel, dtype=np.uint8)
     cv2.drawContours(mask, contours, -1, 255, thickness=cv2.FILLED)
 
-    tiff.imwrite(output_path, mask)
+    tf.imwrite(output_path, mask)
 
     return mask
-
 
 #input_file = 'processing\\BEMS340264_Scene-002.ome.tif'
 #tissue_output_path = 'processing\\tissue_mask.tif'
