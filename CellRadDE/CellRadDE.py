@@ -734,3 +734,119 @@ def organizer(sample_name, channel_name, final_step=False):
 #final_step = True  # Whether to move remaining files or not
 
 #organizer(sample_name, channel_name, final_step)
+
+import tifffile as tf
+import numpy as np
+import os
+import pandas as pd
+
+def nuclei_celltype(tumor_mask_path, nuclei_mask_path, output_path):
+    """
+    Retain only the nuclei mask regions that are within the tumor mask.
+    
+    Parameters:
+    tumor_mask_path (str): Path to the tumor segmentation mask file.
+    nuclei_mask_path (str): Path to the nuclei mask file.
+    output_path (str): Path to save the resulting mask file.
+    
+    Returns:
+    combined_mask (numpy.ndarray): The resulting mask with nuclei regions within the tumor.
+    """
+    tumor_mask = tf.imread(tumor_mask_path).astype(bool)
+    nuclei_mask = tf.imread(nuclei_mask_path).astype(bool)
+
+    if tumor_mask.shape != nuclei_mask.shape:
+        raise ValueError("The dimensions of the tumor mask and nuclei mask do not match.")
+
+    combined_mask = np.zeros_like(nuclei_mask, dtype=np.uint8)
+    combined_mask[nuclei_mask & tumor_mask] = 255
+
+    tf.imwrite(output_path, combined_mask)
+    return combined_mask
+
+def calculate_mean_sd_dose(dose_file, mask_file):
+    """
+    Calculate the mean and standard deviation of the dose values within the nuclei mask.
+    
+    Parameters:
+    dose_file (str): Path to the dose image file.
+    mask_file (str): Path to the nuclei mask file.
+    
+    Returns:
+    tuple: mean dose, standard deviation of dose, number of nuclei
+    """
+    dose_image = tf.imread(dose_file)
+    mask_image = tf.imread(mask_file).astype(bool)
+    
+    dose_in_nuclei = dose_image[mask_image]
+    
+    mean_dose = np.mean(dose_in_nuclei)
+    sd_dose = np.std(dose_in_nuclei)
+    num_nuclei = np.sum(mask_image)
+
+    return mean_dose, sd_dose, num_nuclei
+
+def process_all_masks(dose_files_path, nuclei_mask_path, mask_folder, output_folder, combined_csv):
+    """
+    Process all mask files, extract nuclei masks for each cell type, and calculate dose statistics for multiple dose images.
+    
+    Parameters:
+    dose_files_path (str): Directory path containing the dose image files.
+    nuclei_mask_path (str): Path to the global nuclei mask file.
+    mask_folder (str): Folder containing the binary mask files.
+    output_folder (str): Folder to save the extracted nuclei masks and individual CSV files.
+    combined_csv (str): Path to save the combined CSV file with mean dose values.
+    """
+    results = []
+    combined_results = []
+
+    os.makedirs(output_folder, exist_ok=True)
+
+    for mask_file in os.listdir(mask_folder):
+        if mask_file.startswith("binary_") and mask_file.endswith(".tif"):
+            tumor_mask_path = os.path.join(mask_folder, mask_file)
+            output_path = os.path.join(output_folder, mask_file)
+            nuclei_celltype(tumor_mask_path, nuclei_mask_path, output_path)
+
+    dose_files = [os.path.join(dose_files_path, f) for f in os.listdir(dose_files_path) if f.endswith(".tiff")]
+    all_results = {dose_file: {} for dose_file in dose_files}
+    for dose_file in dose_files:
+        dose_name = os.path.splitext(os.path.basename(dose_file))[0]
+        results = []
+
+        for mask_file in os.listdir(output_folder):
+            if mask_file.startswith("binary_") and mask_file.endswith(".tif"):
+                mask_path = os.path.join(output_folder, mask_file)
+                mean_dose, sd_dose, num_nuclei = calculate_mean_sd_dose(dose_file, mask_path)
+                cell_type = mask_file[len("binary_"): -len(".tif")]
+                results.append([cell_type, mean_dose, sd_dose, num_nuclei])
+                if cell_type not in all_results[dose_file]:
+                    all_results[dose_file][cell_type] = mean_dose
+
+        df = pd.DataFrame(results, columns=["Cell Type", "Mean Dose", "SD Dose", "Number of Nuclei"])
+        output_csv = os.path.join(output_folder, f"{dose_name}_dose_statistics.csv")
+        df.to_csv(output_csv, index=False)
+    combined_data = {"Cell Type": []}
+    for dose_file in dose_files:
+        dose_name = os.path.splitext(os.path.basename(dose_file))[0]
+        combined_data[dose_name] = []
+
+    for cell_type in all_results[dose_files[0]].keys():
+        combined_data["Cell Type"].append(cell_type)
+        for dose_file in dose_files:
+            combined_data[os.path.splitext(os.path.basename(dose_file))[0]].append(all_results[dose_file][cell_type])
+
+    combined_df = pd.DataFrame(combined_data)
+    combined_df.to_csv(combined_csv, index=False)
+
+#nuclei_mask_path = r'c:\Users\Yue\Dropbox (Partners HealthCare)\Microdosimetry_Collab\Final_data_ready_for_TOPAS_half_res\BEMS340264_Scene-002\Supp_Files\nuclei_mask.tif'
+#mask_folder = r'c:\Users\Yue\Dropbox (Partners HealthCare)\Microdosimetry_Collab\Final_data_ready_for_TOPAS_half_res\BEMS340264_Scene-002\Supp_Files\masks'
+#output_folder = r'c:\Users\Yue\Dropbox (Partners HealthCare)\Microdosimetry_Collab\Final_data_ready_for_TOPAS_half_res\BEMS340264_Scene-002\Channel_8\analysis'
+#dose_files_path = r'C:\Users\Yue\Dropbox (Partners HealthCare)\Microdosimetry_Collab\Final_data_ready_for_TOPAS_half_res\BEMS340264_Scene-002\Channel_8\TOPAS_results'
+#combined_csv =  r'c:\Users\Yue\Dropbox (Partners HealthCare)\Microdosimetry_Collab\Final_data_ready_for_TOPAS_half_res\BEMS340264_Scene-002\Channel_8\analysis\final_dose_statistics.csv'
+
+#process_all_masks(dose_files_path, nuclei_mask_path, mask_folder, output_folder, combined_csv)
+
+#print(f"Results saved to individual CSV files in {output_folder}")
+#print(f"Combined results saved to {combined_csv}")
+
