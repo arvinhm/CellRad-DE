@@ -22,6 +22,8 @@ from phenotype_cells import phenotype_cells, load_marker_dict_from_csv
 import shutil
 import subprocess
 import tempfile
+import warnings
+warnings.filterwarnings("ignore", category=FutureWarning)
 
 def subtract_background(input_path, output_path, fiji_path, radius=30):
     # Ensure the paths are absolute
