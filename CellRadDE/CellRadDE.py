@@ -22,8 +22,6 @@ from phenotype_cells import phenotype_cells, load_marker_dict_from_csv
 import shutil
 import subprocess
 import tempfile
-import warnings
-warnings.filterwarnings("ignore", category=FutureWarning)
 
 def subtract_background(input_path, output_path, fiji_path, radius=30):
     # Ensure the paths are absolute
@@ -229,9 +227,6 @@ def extract_pixel_size(metadata):
         raise ValueError("Pixel size information is missing in the OME-TIFF file metadata.")
 
 def create_3d_model(image_path, mask_path, output_dir, channels, use_mask, pixel_size='auto', activity=1):
-    import numpy as np
-    import tifffile as tf
-    import os
 
     with tf.TiffFile(image_path) as tif:
         images = tif.asarray()
@@ -250,15 +245,7 @@ def create_3d_model(image_path, mask_path, output_dir, channels, use_mask, pixel
             print(e)
             raise
     else:
-        if isinstance(pixel_size, (int, float)):
-            element_spacing = (pixel_size, pixel_size, pixel_size)
-        elif isinstance(pixel_size, tuple) and len(pixel_size) == 3:
-            element_spacing = pixel_size
-        else:
-            raise ValueError("Pixel size must be 'auto', a single number, or a tuple of three numbers.")
-
-    # Define the number of slices in the Z-direction
-    num_slices = 10  # You can adjust this value as needed
+        element_spacing = (pixel_size, pixel_size, pixel_size)
 
     for channel in channels:
         channel_dir = os.path.join(output_dir, f'Channel_{channel}')
@@ -271,28 +258,23 @@ def create_3d_model(image_path, mask_path, output_dir, channels, use_mask, pixel
         else:
             masked_image = channel_image
 
-        # Repeat the 2D image along the Z-axis to create a 3D volume
-        masked_image_3d = np.repeat(masked_image[:, :, np.newaxis], num_slices, axis=2)
+        dim_size = (masked_image.shape[0], masked_image.shape[1], 1)
 
-        dim_size = (masked_image_3d.shape[1], masked_image_3d.shape[0], masked_image_3d.shape[2])
-
-        total_A = np.sum(masked_image_3d)
+        total_A = np.sum(masked_image)
         if total_A == 0:
             raise ValueError(f"Total activity in the masked area for channel {channel} is zero.")
-        source_normalized = masked_image_3d / total_A
+        source_normalized = masked_image / total_A
 
         normalized_raw_file_path = os.path.join(channel_dir, 'Source_normalized.raw')
         with open(normalized_raw_file_path, 'wb') as file:
             file.write(source_normalized.astype(np.float32).tobytes())
 
         normalized_mhd_file_path = os.path.join(channel_dir, 'Source_normalized.mhd')
-        write_mhd(normalized_mhd_file_path, dim_size, element_spacing, 'MET_FLOAT',
-                  os.path.basename(normalized_raw_file_path))
+        write_mhd(normalized_mhd_file_path, dim_size, element_spacing, 'MET_FLOAT', os.path.basename(normalized_raw_file_path))
 
         total_a_file_path = os.path.join(channel_dir, 'Total_A_Bq.txt')
         with open(total_a_file_path, 'w') as file:
             file.write(f'{(total_A / activity):.2f}')
-
 
 
 #image_path = 'processing\\BEMS340264_Scene-002.ome.tif'
@@ -413,11 +395,9 @@ ElementDataFile = {data_file}
 """
     with open(filename, 'w') as file:
         file.write(mhd_content)
+
 def ct_scan(mask_path, ome_tiff_path, output_dir, pixel_size='auto'):
-    import numpy as np
-    import tifffile as tf
-    import os
-    from pathlib import Path
+    """Processes the binary mask and raw OME-TIFF file to create a CT image and MHD file."""
 
     Path(output_dir).mkdir(parents=True, exist_ok=True)
 
@@ -435,30 +415,21 @@ def ct_scan(mask_path, ome_tiff_path, output_dir, pixel_size='auto'):
                 raise ValueError("Pixel size must be a tuple with three elements (size_x, size_y, size_z).")
             pixel_size = tuple(pixel_size)
 
-    # Define the number of slices in the Z-direction
-    num_slices = 10  # You can adjust this value as needed
+    CT_image = np.full(mask.shape, -1050, dtype=np.int16)
 
-    # Repeat the mask along the Z-axis to create a 3D volume
-    mask_3d = np.repeat(mask[:, :, np.newaxis], num_slices, axis=2)
-
-    # Create a 3D CT image with default HU values
-    CT_image = np.full(mask_3d.shape, -1050, dtype=np.int16)
-
-    # Assign HU values to the masked regions
-    CT_image[mask_3d] = 19  # Soft tissue is 19 HU
+    CT_image[mask] = 19  # soft tissue is 19
 
     raw_file_path = Path(output_dir) / 'CT.raw'
     with open(raw_file_path, 'wb') as file:
         file.write(CT_image.tobytes())
 
-    dim_size = (CT_image.shape[1], CT_image.shape[0], CT_image.shape[2])
-    element_spacing = pixel_size
+    dim_size = (CT_image.shape[1], CT_image.shape[0], 1)
+    element_spacing = pixel_size 
 
     mhd_file_path = Path(output_dir) / 'CT.mhd'
     write_mhd(mhd_file_path, dim_size, element_spacing, 'MET_SHORT', raw_file_path.name)
 
     print(f"CT image and MHD file saved to {output_dir}")
-
 
 # Example call to the function
 #mask_path = r'c:\Users\Yue\Desktop\FINAL_MC\BEMS340264_Scene-002\tissue_mask.tif'
@@ -657,43 +628,32 @@ def nuclei_celltype(tumor_mask_path, nuclei_mask_path, output_path):
 
 #combined_mask = nuclei_celltype(tumor_mask_path, nuclei_mask_path, output_path)
 
-def update_mac_file(file_path, output_dir, element_spacing, dim_size):
-    import os
 
-    size_x = element_spacing[0] * dim_size[0]
-    size_y = element_spacing[1] * dim_size[1]
-    size_z = element_spacing[2] * dim_size[2]
-
-    voxel_size_x = element_spacing[0]
-    voxel_size_y = element_spacing[1]
-    voxel_size_z = element_spacing[2]
-
-    resolution_x = dim_size[0]
-    resolution_y = dim_size[1]
-    resolution_z = dim_size[2]
-
+def update_mac_file(file_path, output_dir, size_x, size_y, size_z, resolution_x, resolution_y):
     with open(file_path, 'r') as file:
         lines = file.readlines()
 
     new_lines = []
     for line in lines:
-        if '/gate/actor/dose3D/setVoxelSize' in line:
-            new_lines.append(f'/gate/actor/dose3D/setVoxelSize         {voxel_size_x} {voxel_size_y} {voxel_size_z} mm\n')
+        if 'SetCutInRegion' in line and 'phantom' in line:
+            new_line = line.split()
+            new_line[-2] = f"{size_x / 1000:.6f}"
+            new_lines.append(' '.join(new_line) + '\n')
+        elif '/gate/actor/dose3D/setVoxelSize' in line:
+            new_lines.append(f'/gate/actor/dose3D/setVoxelSize         {size_x / 1000:.6f} {size_y / 1000:.6f} {size_z / 1000:.6f} mm\n')
         elif '/gate/actor/dose3D/setResolution' in line:
-            new_lines.append(f'/gate/actor/dose3D/setResolution         {resolution_x} {resolution_y} {resolution_z}\n')
-        elif '/gate/source/*Source/setPosition' in line:
-            # Calculate the offsets to center the source in the phantom
-            pos_x = -size_x / 2
-            pos_y = -size_y / 2
-            pos_z = -size_z / 2
-            new_lines.append(f'{line.split()[0]} {pos_x:.4f} {pos_y:.4f} {pos_z:.4f} mm\n')
+            new_lines.append(f'/gate/actor/dose3D/setResolution         {resolution_x} {resolution_y} 1\n')
+        elif '/gate/source/Cu67Source/setPosition' in line:
+            pos_x = (resolution_x * size_x / 2) * -1
+            pos_y = (resolution_y * size_y / 2) * -1
+            pos_z = (size_z / 2) * -1
+            new_lines.append(f'/gate/source/Cu67Source/setPosition {pos_x:.4f} {pos_y:.4f} {pos_z:.4f} um\n')
         else:
             new_lines.append(line)
 
     new_file_path = os.path.join(output_dir, os.path.basename(file_path))
     with open(new_file_path, 'w') as new_file:
         new_file.writelines(new_lines)
-
 
 def process_mac_files(input_dir, output_dir, ome_tiff_path):
     if not os.path.exists(output_dir):
@@ -777,116 +737,28 @@ def organizer(sample_name, channel_name, final_step=False):
 
 import tifffile as tf
 import numpy as np
-import os
-import pandas as pd
-
-def nuclei_celltype(tumor_mask_path, nuclei_mask_path, output_path):
-    """
-    Retain only the nuclei mask regions that are within the tumor mask.
-    
-    Parameters:
-    tumor_mask_path (str): Path to the tumor segmentation mask file.
-    nuclei_mask_path (str): Path to the nuclei mask file.
-    output_path (str): Path to save the resulting mask file.
-    
-    Returns:
-    combined_mask (numpy.ndarray): The resulting mask with nuclei regions within the tumor.
-    """
-    tumor_mask = tf.imread(tumor_mask_path).astype(bool)
-    nuclei_mask = tf.imread(nuclei_mask_path).astype(bool)
-
-    if tumor_mask.shape != nuclei_mask.shape:
-        raise ValueError("The dimensions of the tumor mask and nuclei mask do not match.")
-
-    combined_mask = np.zeros_like(nuclei_mask, dtype=np.uint8)
-    combined_mask[nuclei_mask & tumor_mask] = 255
-
-    tf.imwrite(output_path, combined_mask)
-    return combined_mask
 
 def calculate_mean_sd_dose(dose_file, mask_file):
-    """
-    Calculate the mean and standard deviation of the dose values within the nuclei mask.
-    
-    Parameters:
-    dose_file (str): Path to the dose image file.
-    mask_file (str): Path to the nuclei mask file.
-    
-    Returns:
-    tuple: mean dose, standard deviation of dose, number of nuclei
-    """
+    # Read the dose and mask TIFF files
     dose_image = tf.imread(dose_file)
-    mask_image = tf.imread(mask_file).astype(bool)
-    
+    mask_image = tf.imread(mask_file)
+
+    # Ensure the mask is binary
+    mask_image = mask_image.astype(bool)
+
+    # Extract the dose values within the nuclei mask
     dose_in_nuclei = dose_image[mask_image]
-    
+
+    # Calculate the mean and standard deviation of the dose values within the mask
     mean_dose = np.mean(dose_in_nuclei)
     sd_dose = np.std(dose_in_nuclei)
-    num_nuclei = np.sum(mask_image)
 
-    return mean_dose, sd_dose, num_nuclei
+    return mean_dose, sd_dose
 
-def process_all_masks(dose_files_path, nuclei_mask_path, mask_folder, output_folder, combined_csv):
-    """
-    Process all mask files, extract nuclei masks for each cell type, and calculate dose statistics for multiple dose images.
-    
-    Parameters:
-    dose_files_path (str): Directory path containing the dose image files.
-    nuclei_mask_path (str): Path to the global nuclei mask file.
-    mask_folder (str): Folder containing the binary mask files.
-    output_folder (str): Folder to save the extracted nuclei masks and individual CSV files.
-    combined_csv (str): Path to save the combined CSV file with mean dose values.
-    """
-    results = []
-    combined_results = []
+# Example usage
+dose_file = 'path/to/your/dose_image.tif'
+mask_file = 'path/to/your/nuclei_mask.tif'
+mean_dose, sd_dose = calculate_mean_sd_dose(dose_file, mask_file)
 
-    os.makedirs(output_folder, exist_ok=True)
-
-    for mask_file in os.listdir(mask_folder):
-        if mask_file.startswith("binary_") and mask_file.endswith(".tif"):
-            tumor_mask_path = os.path.join(mask_folder, mask_file)
-            output_path = os.path.join(output_folder, mask_file)
-            nuclei_celltype(tumor_mask_path, nuclei_mask_path, output_path)
-
-    dose_files = [os.path.join(dose_files_path, f) for f in os.listdir(dose_files_path) if f.endswith(".tiff")]
-    all_results = {dose_file: {} for dose_file in dose_files}
-    for dose_file in dose_files:
-        dose_name = os.path.splitext(os.path.basename(dose_file))[0]
-        results = []
-
-        for mask_file in os.listdir(output_folder):
-            if mask_file.startswith("binary_") and mask_file.endswith(".tif"):
-                mask_path = os.path.join(output_folder, mask_file)
-                mean_dose, sd_dose, num_nuclei = calculate_mean_sd_dose(dose_file, mask_path)
-                cell_type = mask_file[len("binary_"): -len(".tif")]
-                results.append([cell_type, mean_dose, sd_dose, num_nuclei])
-                if cell_type not in all_results[dose_file]:
-                    all_results[dose_file][cell_type] = mean_dose
-
-        df = pd.DataFrame(results, columns=["Cell Type", "Mean Dose", "SD Dose", "Number of Nuclei"])
-        output_csv = os.path.join(output_folder, f"{dose_name}_dose_statistics.csv")
-        df.to_csv(output_csv, index=False)
-    combined_data = {"Cell Type": []}
-    for dose_file in dose_files:
-        dose_name = os.path.splitext(os.path.basename(dose_file))[0]
-        combined_data[dose_name] = []
-
-    for cell_type in all_results[dose_files[0]].keys():
-        combined_data["Cell Type"].append(cell_type)
-        for dose_file in dose_files:
-            combined_data[os.path.splitext(os.path.basename(dose_file))[0]].append(all_results[dose_file][cell_type])
-
-    combined_df = pd.DataFrame(combined_data)
-    combined_df.to_csv(combined_csv, index=False)
-
-#nuclei_mask_path = r'c:\Users\Yue\Dropbox (Partners HealthCare)\Microdosimetry_Collab\Final_data_ready_for_TOPAS_half_res\BEMS340264_Scene-002\Supp_Files\nuclei_mask.tif'
-#mask_folder = r'c:\Users\Yue\Dropbox (Partners HealthCare)\Microdosimetry_Collab\Final_data_ready_for_TOPAS_half_res\BEMS340264_Scene-002\Supp_Files\masks'
-#output_folder = r'c:\Users\Yue\Dropbox (Partners HealthCare)\Microdosimetry_Collab\Final_data_ready_for_TOPAS_half_res\BEMS340264_Scene-002\Channel_8\analysis'
-#dose_files_path = r'C:\Users\Yue\Dropbox (Partners HealthCare)\Microdosimetry_Collab\Final_data_ready_for_TOPAS_half_res\BEMS340264_Scene-002\Channel_8\TOPAS_results'
-#combined_csv =  r'c:\Users\Yue\Dropbox (Partners HealthCare)\Microdosimetry_Collab\Final_data_ready_for_TOPAS_half_res\BEMS340264_Scene-002\Channel_8\analysis\final_dose_statistics.csv'
-
-#process_all_masks(dose_files_path, nuclei_mask_path, mask_folder, output_folder, combined_csv)
-
-#print(f"Results saved to individual CSV files in {output_folder}")
-#print(f"Combined results saved to {combined_csv}")
-
+print(f"Mean dose in nuclei: {mean_dose}")
+print(f"Standard deviation of dose in nuclei: {sd_dose}")
