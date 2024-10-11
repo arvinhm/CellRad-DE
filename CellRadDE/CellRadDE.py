@@ -229,6 +229,9 @@ def extract_pixel_size(metadata):
         raise ValueError("Pixel size information is missing in the OME-TIFF file metadata.")
 
 def create_3d_model(image_path, mask_path, output_dir, channels, use_mask, pixel_size='auto', activity=1):
+    import numpy as np
+    import tifffile as tf
+    import os
 
     with tf.TiffFile(image_path) as tif:
         images = tif.asarray()
@@ -247,7 +250,15 @@ def create_3d_model(image_path, mask_path, output_dir, channels, use_mask, pixel
             print(e)
             raise
     else:
-        element_spacing = (pixel_size, pixel_size, pixel_size)
+        if isinstance(pixel_size, (int, float)):
+            element_spacing = (pixel_size, pixel_size, pixel_size)
+        elif isinstance(pixel_size, tuple) and len(pixel_size) == 3:
+            element_spacing = pixel_size
+        else:
+            raise ValueError("Pixel size must be 'auto', a single number, or a tuple of three numbers.")
+
+    # Define the number of slices in the Z-direction
+    num_slices = 10  # You can adjust this value as needed
 
     for channel in channels:
         channel_dir = os.path.join(output_dir, f'Channel_{channel}')
@@ -260,23 +271,28 @@ def create_3d_model(image_path, mask_path, output_dir, channels, use_mask, pixel
         else:
             masked_image = channel_image
 
-        dim_size = (masked_image.shape[0], masked_image.shape[1], 1)
+        # Repeat the 2D image along the Z-axis to create a 3D volume
+        masked_image_3d = np.repeat(masked_image[:, :, np.newaxis], num_slices, axis=2)
 
-        total_A = np.sum(masked_image)
+        dim_size = (masked_image_3d.shape[1], masked_image_3d.shape[0], masked_image_3d.shape[2])
+
+        total_A = np.sum(masked_image_3d)
         if total_A == 0:
             raise ValueError(f"Total activity in the masked area for channel {channel} is zero.")
-        source_normalized = masked_image / total_A
+        source_normalized = masked_image_3d / total_A
 
         normalized_raw_file_path = os.path.join(channel_dir, 'Source_normalized.raw')
         with open(normalized_raw_file_path, 'wb') as file:
             file.write(source_normalized.astype(np.float32).tobytes())
 
         normalized_mhd_file_path = os.path.join(channel_dir, 'Source_normalized.mhd')
-        write_mhd(normalized_mhd_file_path, dim_size, element_spacing, 'MET_FLOAT', os.path.basename(normalized_raw_file_path))
+        write_mhd(normalized_mhd_file_path, dim_size, element_spacing, 'MET_FLOAT',
+                  os.path.basename(normalized_raw_file_path))
 
         total_a_file_path = os.path.join(channel_dir, 'Total_A_Bq.txt')
         with open(total_a_file_path, 'w') as file:
             file.write(f'{(total_A / activity):.2f}')
+
 
 
 #image_path = 'processing\\BEMS340264_Scene-002.ome.tif'
@@ -397,9 +413,11 @@ ElementDataFile = {data_file}
 """
     with open(filename, 'w') as file:
         file.write(mhd_content)
-
 def ct_scan(mask_path, ome_tiff_path, output_dir, pixel_size='auto'):
-    """Processes the binary mask and raw OME-TIFF file to create a CT image and MHD file."""
+    import numpy as np
+    import tifffile as tf
+    import os
+    from pathlib import Path
 
     Path(output_dir).mkdir(parents=True, exist_ok=True)
 
@@ -417,21 +435,30 @@ def ct_scan(mask_path, ome_tiff_path, output_dir, pixel_size='auto'):
                 raise ValueError("Pixel size must be a tuple with three elements (size_x, size_y, size_z).")
             pixel_size = tuple(pixel_size)
 
-    CT_image = np.full(mask.shape, -1050, dtype=np.int16)
+    # Define the number of slices in the Z-direction
+    num_slices = 10  # You can adjust this value as needed
 
-    CT_image[mask] = 19  # soft tissue is 19
+    # Repeat the mask along the Z-axis to create a 3D volume
+    mask_3d = np.repeat(mask[:, :, np.newaxis], num_slices, axis=2)
+
+    # Create a 3D CT image with default HU values
+    CT_image = np.full(mask_3d.shape, -1050, dtype=np.int16)
+
+    # Assign HU values to the masked regions
+    CT_image[mask_3d] = 19  # Soft tissue is 19 HU
 
     raw_file_path = Path(output_dir) / 'CT.raw'
     with open(raw_file_path, 'wb') as file:
         file.write(CT_image.tobytes())
 
-    dim_size = (CT_image.shape[1], CT_image.shape[0], 1)
-    element_spacing = pixel_size 
+    dim_size = (CT_image.shape[1], CT_image.shape[0], CT_image.shape[2])
+    element_spacing = pixel_size
 
     mhd_file_path = Path(output_dir) / 'CT.mhd'
     write_mhd(mhd_file_path, dim_size, element_spacing, 'MET_SHORT', raw_file_path.name)
 
     print(f"CT image and MHD file saved to {output_dir}")
+
 
 # Example call to the function
 #mask_path = r'c:\Users\Yue\Desktop\FINAL_MC\BEMS340264_Scene-002\tissue_mask.tif'
@@ -630,32 +657,43 @@ def nuclei_celltype(tumor_mask_path, nuclei_mask_path, output_path):
 
 #combined_mask = nuclei_celltype(tumor_mask_path, nuclei_mask_path, output_path)
 
+def update_mac_file(file_path, output_dir, element_spacing, dim_size):
+    import os
 
-def update_mac_file(file_path, output_dir, size_x, size_y, size_z, resolution_x, resolution_y):
+    size_x = element_spacing[0] * dim_size[0]
+    size_y = element_spacing[1] * dim_size[1]
+    size_z = element_spacing[2] * dim_size[2]
+
+    voxel_size_x = element_spacing[0]
+    voxel_size_y = element_spacing[1]
+    voxel_size_z = element_spacing[2]
+
+    resolution_x = dim_size[0]
+    resolution_y = dim_size[1]
+    resolution_z = dim_size[2]
+
     with open(file_path, 'r') as file:
         lines = file.readlines()
 
     new_lines = []
     for line in lines:
-        if 'SetCutInRegion' in line and 'phantom' in line:
-            new_line = line.split()
-            new_line[-2] = f"{size_x / 1000:.6f}"
-            new_lines.append(' '.join(new_line) + '\n')
-        elif '/gate/actor/dose3D/setVoxelSize' in line:
-            new_lines.append(f'/gate/actor/dose3D/setVoxelSize         {size_x / 1000:.6f} {size_y / 1000:.6f} {size_z / 1000:.6f} mm\n')
+        if '/gate/actor/dose3D/setVoxelSize' in line:
+            new_lines.append(f'/gate/actor/dose3D/setVoxelSize         {voxel_size_x} {voxel_size_y} {voxel_size_z} mm\n')
         elif '/gate/actor/dose3D/setResolution' in line:
-            new_lines.append(f'/gate/actor/dose3D/setResolution         {resolution_x} {resolution_y} 1\n')
-        elif '/gate/source/Cu67Source/setPosition' in line:
-            pos_x = (resolution_x * size_x / 2) * -1
-            pos_y = (resolution_y * size_y / 2) * -1
-            pos_z = (size_z / 2) * -1
-            new_lines.append(f'/gate/source/Cu67Source/setPosition {pos_x:.4f} {pos_y:.4f} {pos_z:.4f} um\n')
+            new_lines.append(f'/gate/actor/dose3D/setResolution         {resolution_x} {resolution_y} {resolution_z}\n')
+        elif '/gate/source/*Source/setPosition' in line:
+            # Calculate the offsets to center the source in the phantom
+            pos_x = -size_x / 2
+            pos_y = -size_y / 2
+            pos_z = -size_z / 2
+            new_lines.append(f'{line.split()[0]} {pos_x:.4f} {pos_y:.4f} {pos_z:.4f} mm\n')
         else:
             new_lines.append(line)
 
     new_file_path = os.path.join(output_dir, os.path.basename(file_path))
     with open(new_file_path, 'w') as new_file:
         new_file.writelines(new_lines)
+
 
 def process_mac_files(input_dir, output_dir, ome_tiff_path):
     if not os.path.exists(output_dir):
