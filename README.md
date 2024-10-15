@@ -128,6 +128,7 @@ docker run -it --rm -v /working/directory:/APP gate-arm64 Gate /APP/mac/177Lu.ma
 ```
 ##### GATE and Geant4 docker compile in AMD64
 Make sure the container is set to Linux. The installation process takes 1-2 hours.
+Make sure your Docker has a stable internet connection.
 
 ```bash
 cd gate_docker_windows
