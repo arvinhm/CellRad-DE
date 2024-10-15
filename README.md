@@ -119,9 +119,16 @@ celltype_prediction(adata_path='path/to/cell_data.h5ad', marker_csv_path='path/t
 ##### GATE and Geant4 docker compile in ARM64
 
 ```bash
-cd docker
+cd gate_docker_arm64
 docker buildx build --platform linux/arm64 -t gate-arm64 --load .
 docker run -it --rm -v /working/directory:/APP gate-arm64 Gate /APP/mac/177Lu.mac
+```
+##### GATE and Geant4 docker compile in ARM64
+Make sure the container is set to Linux.
+```bash
+cd gate_docker_windows
+docker build -t gate-amd64 .
+docker run -it --rm -v /working/directory:/APP gate-amd64 Gate /APP/mac/177Lu.mac
 ```
 
 #### analyzer
