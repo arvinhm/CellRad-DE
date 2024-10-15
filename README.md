@@ -115,7 +115,9 @@ celltype_prediction(adata_path='path/to/cell_data.h5ad', marker_csv_path='path/t
 ```output_dir```: Path to the output files
 ![Diagram](images/figure_1.png)
 
-#### simulation
+### Simulation set up
+First, ([download](https://www.docker.com/get-started) and install Docker based on your system.
+
 ##### GATE and Geant4 docker compile in ARM64
 The installation process takes 1-2 hours.
 
