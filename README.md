@@ -116,7 +116,7 @@ celltype_prediction(adata_path='path/to/cell_data.h5ad', marker_csv_path='path/t
 ![Diagram](images/figure_1.png)
 
 ### Simulation set up
-First, ([download](https://www.docker.com/get-started) and install Docker based on your system.
+First, [download](https://www.docker.com/get-started) and install Docker based on your system.
 
 ##### GATE and Geant4 docker compile in ARM64
 The installation process takes 1-2 hours.
