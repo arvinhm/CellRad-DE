@@ -123,7 +123,7 @@ cd gate_docker_arm64
 docker buildx build --platform linux/arm64 -t gate-arm64 --load .
 docker run -it --rm -v /working/directory:/APP gate-arm64 Gate /APP/mac/177Lu.mac
 ```
-##### GATE and Geant4 docker compile in ARM64
+##### GATE and Geant4 docker compile in AMD64
 Make sure the container is set to Linux.
 ```bash
 cd gate_docker_windows
