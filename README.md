@@ -116,7 +116,13 @@ celltype_prediction(adata_path='path/to/cell_data.h5ad', marker_csv_path='path/t
 ![Diagram](images/figure_1.png)
 
 #### simulation
-##### Coming soon ...
+##### GATE and Geant4 docker compile in ARM64
+
+```bash
+cd docker
+docker buildx build --platform linux/arm64 -t gate-arm64 --load .
+docker run -it --rm -v /working/directory:/APP gate-arm64 Gate /APP/mac/177Lu.mac
+```
 
 #### analyzer
 ##### Coming soon ...
